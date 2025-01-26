@@ -1,0 +1,8 @@
+{
+    "schema": "./utils/schema.js",
+    "out": "./drizzle",
+    "driver": "pg",
+    "dbCredentials": {
+      "connectionString": "postgresql://ai-interview-mocker_owner:mRxA72dyuOYB@ep-polished-star-a8y243au.eastus2.azure.neon.tech/ai-interview-mocker?sslmode=require"
+    }
+  }
