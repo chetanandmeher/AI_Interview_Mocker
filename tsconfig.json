@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-  "baseUrl": ".",
-  "paths": {
-      "@/*": ["./*"]
-      },
-
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
     "target": "ES2017",
     "lib": [
       "dom",
@@ -26,14 +27,16 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "app/(authentication)/sign-in/[[...sign-in]]/page.jsx"  ],
+    "**/*.tsx",
+    "app/(authentication)/sign-in/[[...sign-in]]/page.jsx"
+  ],
   "exclude": [
     "node_modules"
   ]

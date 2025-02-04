@@ -14,13 +14,12 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { chatSession } from '@/utils/GeminiAIModel'
 import { LoaderCircle } from 'lucide-react'
-import { db } from '@/utils/database'
+import  db  from '@/utils/database'
 import { useUser } from '@clerk/nextjs'
 import { v4 as uuidv4 } from 'uuid';
 import { MockInterview } from '@/utils/schema'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import pool from '@/utils/database'
 
 
 function AddNewInterview() {
@@ -47,52 +46,67 @@ function AddNewInterview() {
         console.log('Job Position:',jobPosition);
         console.log('Job Description:',jobDescription);
         console.log('Job Experience:',jobExperience);
-        
+
         try {
-        // Input promt for the user to give the interview questions and answers
-        const InputPromt = "Job Position: "+jobPosition+"\nJob Description: "+jobDescription+"\nJob Experience: "+jobExperience + 
-                            "\nbased on this information give me "+process.env.NEXT_PUBLIC_NUMBER_OF_QUESTIONS+" interview questions along with the answers in JSON format. Give me question and answer field in JSON."; 
-        console.log("inputPrompt:\n",InputPromt);
+            // Input promt for the user to give the interview questions and answers
+            const InputPromt = "Job Position: "+jobPosition+"\nJob Description: "+jobDescription+"\nJob Experience: "+jobExperience + 
+                                "\nbased on this information give me "+process.env.NEXT_PUBLIC_NUMBER_OF_QUESTIONS+" interview questions along with the answers in JSON format. Give me question and answer field in JSON."; 
+            console.log("inputPrompt:\n",InputPromt);
 
-        
-        const result= await chatSession.sendMessage(InputPromt);
-        // # remove the extra tags from response
-        const MockJsonResponse = (result.response.text()).replace(/```json/g, "").replace(/```/g, "").trim();
-        // console.log("RawResponse:\n",MockJsonResponse);
-        console.log('Result:',JSON.parse(MockJsonResponse));
-        
-        // set the response from the gemini api in text format
-        setJsonResponse(MockJsonResponse);
-        
-        // push the data in the database table
-        const primaryEmailAddress = user?.primaryEmailAddress?.emailAddress;
-        console.log("emailAddress: ", primaryEmailAddress);
-        if (MockJsonResponse){
-            const response = await db.insert(MockInterview)
-            .values({
-                jsonMockResponse: MockJsonResponse,
-                jobPosition: jobPosition,
-                jobDescription: jobDescription,
-                jobExperience: jobExperience,
-                createdBy: user?.primaryEmailAddress?.emailAddress,
-                createdAt: moment().format('DD-MM-YYYY HH:mm:ss'),
-                mockId: uuidv4()
-            })
-            .returning({mockId:MockInterview.mockId});
-            console.log('Inserting Mock ID: ',response);
-        }else { 
-            console.log('Error in generating response from AI');
-        }
-    } catch (error) {   
-        console.log('Error in generating response from AI',error);
-    }
-        // setloading to false
-        if (response){
+            const result= await chatSession.sendMessage(InputPromt);
+            // # remove the extra tags from response
+            const MockJsonResponse = (result.response.text()).replace(/```json/g, "").replace(/```/g, "").trim();
+            // console.log("RawResponse:\n",MockJsonResponse);
+            console.log('Result:',JSON.parse(MockJsonResponse));
+            
+            // set the response from the gemini api in text format
+            setJsonResponse(MockJsonResponse);
+            
+            // push the data in the database table
+            const primaryEmailAddress = user?.primaryEmailAddress?.emailAddress;
+            console.log("emailAddress: ", primaryEmailAddress);
+            if (MockJsonResponse){
+                const query = `
+                    INSERT INTO "mockInterview" (
+                        jsonMockResponse,
+                        jobPosition,
+                        jobDescription,
+                        jobExperience,
+                        createdBy,
+                        createdAt,
+                        mockId
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7)  
+                     RETURING mockId
+                `;
+
+                const mockId = uuidv4();
+                const createdAt = moment().format('DD-MM-YYYY HH:mm:ss');
+                const values = [
+                    MockJsonResponse,
+                    jobPosition,
+                    jobDescription,
+                    jobExperience,
+                    primaryEmailAddress,
+                    createdAt,
+                    mockId
+                ];
+
+                const response = await db.query(query, values);
+                console.log("Inserting mock Id: ", response.rows[0].mockId);
+
+                console.log('Inserting Mock ID: ',response);
+                // setloading to false
+                setLoading(false);
+                // route to the interview page
+                router.push("/dashboard/interview/"+response.rows[0].mockId)
+            }else { 
+                console.log('Error in generating response from AI');
+                setLoading(false);
+            }
+        } catch (error) {   
+            console.log('Error in generating response from AI',error);
             setLoading(false);
-            // route to the interview page
-            router.push("/dashboard/iterview/"+response[0]?.mockId)
-
-        } 
+        }
     };
 
   return (

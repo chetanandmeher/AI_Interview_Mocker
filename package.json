@@ -11,8 +11,13 @@
     "db:push": "npx drizzle-kit push",
     "db:studio": "npx drizzle-kit studio"
   },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "dependencies": {
-    "@clerk/nextjs": "^6.9.14",
+    "@clerk/nextjs": "^6.10.4",
     "@google/generative-ai": "^0.21.0",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-dialog": "^1.1.4",
@@ -20,12 +25,14 @@
     "@radix-ui/react-toast": "^1.2.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dns": "^0.1.2",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.4",
     "knex": "^3.1.0",
     "lucide-react": "^0.473.0",
     "moment": "^2.30.1",
-    "next": "15.1.5",
+    "net": "^1.0.2",
+    "next": "^15.1.5",
     "pg": "^8.13.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -33,6 +40,7 @@
     "react-webcam": "^7.2.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "tls": "^0.0.1",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
